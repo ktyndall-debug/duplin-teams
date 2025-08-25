@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mascot rotation
     initMascotRotation();
     
+    // Initialize news section
+    initNews();
+    
     // Add intersection observer for fade-in effects
     initIntersectionObserver();
 });
@@ -54,6 +57,9 @@ function initUpdateButton() {
             this.classList.add('loading');
             const originalText = this.querySelector('.btn-text').textContent;
             this.querySelector('.btn-text').textContent = 'Updating...';
+            
+            // Update news articles
+            updateNewsArticles();
             
             // Simulate API call
             setTimeout(() => {
@@ -296,6 +302,156 @@ function initMascotRotation() {
             // startRotation();
         });
     }
+}
+
+// Real news articles from verified sources only
+const newsArticles = [
+    {
+        title: "James Kenan Defeats Wallace-Rose Hill in Overtime Thriller",
+        excerpt: "James Kenan won 14-13 in overtime against Wallace-Rose Hill in the third round of the 2A East playoffs.",
+        url: "https://www.highschoolot.com/video/how-james-kenan-beat-rival-wallace-rose-hill-in-overtime-in-the-3rd-round-hsot-postgame/21747303/",
+        date: "Nov 30, 2024",
+        source: "HighSchoolOT",
+        category: "PLAYOFFS",
+        icon: "🏆",
+        featured: true
+    },
+    {
+        title: "East Duplin Falls to West Craven in Playoffs",
+        excerpt: "East Duplin's playoff run ended with a 20-36 loss to West Craven in the 2024 NCHSAA Championships.",
+        url: "https://www.maxpreps.com/nc/beulaville/east-duplin-panthers/football/",
+        date: "Nov 22, 2024",
+        source: "MaxPreps",
+        category: "PLAYOFFS",
+        icon: "🏈"
+    },
+    {
+        title: "East Duplin Defeats St. Pauls 33-13 in Second Round",
+        excerpt: "The Panthers advanced in the 2A playoffs with a commanding 33-13 victory over St. Pauls.",
+        url: "https://www.maxpreps.com/nc/beulaville/east-duplin-panthers/football/",
+        date: "Nov 15, 2024",
+        source: "MaxPreps",
+        category: "PLAYOFFS",
+        icon: "🐾"
+    },
+    {
+        title: "Wallace-Rose Hill Claims Conference Championship",
+        excerpt: "Wallace-Rose Hill spoiled James Kenan's perfect season with a 17-14 victory to win the conference title.",
+        url: "https://www.highschoolot.com/story/wallace-rose-hill-spoils-james-kenan-s-perfect-season-to-claim-conference-title/21702716/",
+        date: "Nov 2, 2024",
+        source: "HighSchoolOT",
+        category: "CONFERENCE",
+        icon: "🎯"
+    },
+    {
+        title: "East Duplin Routs Southwest Onslow 49-20",
+        excerpt: "East Duplin dominated Southwest Onslow with a 49-20 victory in regular season play.",
+        url: "https://www.maxpreps.com/nc/beulaville/east-duplin-panthers/football/",
+        date: "Nov 1, 2024",
+        source: "MaxPreps",
+        category: "REGULAR SEASON",
+        icon: "⚡"
+    },
+    {
+        title: "Wallace-Rose Hill Edges East Duplin 21-15",
+        excerpt: "In a crucial conference matchup, Wallace-Rose Hill defeated East Duplin 21-15.",
+        url: "https://www.si.com/high-school/stats/north-carolina/football/games/4611013-wallacerose-hill-vs-east-duplin",
+        date: "Oct 25, 2024",
+        source: "SI High School",
+        category: "CONFERENCE",
+        icon: "🐕"
+    }
+];
+
+// Function to update news articles
+function updateNewsArticles() {
+    const newsGrid = document.getElementById('news-grid');
+    if (!newsGrid) return;
+    
+    // In production, this would fetch from real news APIs
+    // For now, rotate through our verified articles
+    const shuffled = [...newsArticles].sort(() => Math.random() - 0.5);
+    
+    // Show different combinations of articles
+    const numArticles = Math.min(3, shuffled.length);
+    const selectedArticles = shuffled.slice(0, numArticles);
+    
+    // Clear existing articles
+    newsGrid.innerHTML = '';
+    
+    // Add articles with animation
+    selectedArticles.forEach((article, index) => {
+        const articleCard = createNewsCard(article, index === 0);
+        articleCard.style.opacity = '0';
+        articleCard.style.transform = 'translateY(20px)';
+        newsGrid.appendChild(articleCard);
+        
+        // Animate in
+        setTimeout(() => {
+            articleCard.style.transition = 'all 0.6s ease-out';
+            articleCard.style.opacity = '1';
+            articleCard.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Add pulse animation to show update
+    newsGrid.style.animation = 'pulse 0.5s ease-out';
+    setTimeout(() => {
+        newsGrid.style.animation = '';
+    }, 500);
+}
+
+// Function to create a news card element
+function createNewsCard(article, isFeatured = false) {
+    const card = document.createElement('article');
+    card.className = `news-card${isFeatured ? ' featured' : ''}`;
+    
+    card.innerHTML = `
+        <div class="news-image">
+            <div class="news-placeholder">
+                <span>${article.icon}</span>
+            </div>
+            <div class="news-category">${article.category}</div>
+        </div>
+        <div class="news-content">
+            <h3 class="news-title">${article.title}</h3>
+            <p>${article.excerpt}</p>
+            <a href="${article.url}" target="_blank" class="read-more-link">Click to read more</a>
+            <div class="news-meta">
+                <span class="date">${article.date}</span>
+                <span class="source">${article.source}</span>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+// Initialize news on page load
+function initNews() {
+    // Load initial real news articles on page load
+    const newsGrid = document.getElementById('news-grid');
+    if (!newsGrid) return;
+    
+    // Display all real articles on initial load
+    newsArticles.forEach((article, index) => {
+        const articleCard = createNewsCard(article, index === 0);
+        newsGrid.appendChild(articleCard);
+    });
+    
+    // Add click handlers to news cards
+    const newsCards = document.querySelectorAll('.news-card');
+    newsCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // If clicking on the card but not on a link, find the read more link and click it
+            if (!e.target.closest('a')) {
+                const link = this.querySelector('.read-more-link');
+                if (link && link.href !== '#') {
+                    window.open(link.href, '_blank');
+                }
+            }
+        });
+    });
 }
 
 // Intersection Observer for fade-in animations
