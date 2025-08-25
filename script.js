@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize ticker
     initScoreTicker();
     
+    // Initialize mascot rotation
+    initMascotRotation();
+    
     // Add intersection observer for fade-in effects
     initIntersectionObserver();
 });
@@ -245,6 +248,53 @@ function initScoreTicker() {
         // Clone ticker content for seamless loop
         const clone = tickerContent.cloneNode(true);
         tickerContent.parentNode.appendChild(clone);
+    }
+}
+
+// Initialize mascot rotation
+function initMascotRotation() {
+    const mascots = document.querySelectorAll('.mascot');
+    if (mascots.length === 0) return;
+    
+    let currentIndex = 0;
+    
+    // Function to rotate to next mascot
+    function rotateMascot() {
+        // Remove active class from current mascot
+        mascots[currentIndex].classList.remove('active');
+        
+        // Move to next mascot
+        currentIndex = (currentIndex + 1) % mascots.length;
+        
+        // Add active class to new mascot
+        mascots[currentIndex].classList.add('active');
+        
+        // Add a subtle pulse effect when switching
+        const newMascot = mascots[currentIndex];
+        const emoji = newMascot.querySelector('.mascot-emoji');
+        emoji.style.animation = 'none';
+        setTimeout(() => {
+            emoji.style.animation = 'float-mascot 3s ease-in-out infinite, pulse-in 0.5s ease-out';
+        }, 10);
+    }
+    
+    // Start rotation every 3 seconds
+    setInterval(rotateMascot, 3000);
+    
+    // Add hover pause functionality
+    const mascotContainer = document.querySelector('.mascot-container');
+    let rotationInterval;
+    
+    if (mascotContainer) {
+        mascotContainer.addEventListener('mouseenter', () => {
+            // Optional: pause rotation on hover
+            // clearInterval(rotationInterval);
+        });
+        
+        mascotContainer.addEventListener('mouseleave', () => {
+            // Optional: resume rotation after hover
+            // startRotation();
+        });
     }
 }
 
