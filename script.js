@@ -85,7 +85,7 @@ function showUpdateSuccess() {
     notification.className = 'update-notification';
     notification.innerHTML = `
         <span class="notification-icon">✓</span>
-        <span class="notification-text">Scores Updated Successfully!</span>
+        <span class="notification-text">Info Updated Successfully!</span>
     `;
     
     // Style the notification
